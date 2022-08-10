@@ -1,25 +1,66 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import Header from "./components/Header";
+import Posts from "./components/Posts";
+import Post from "./components/Post";
+import NotFound from "./components/NotFound";
+import PostForm from "./components/PostForm";
+import Message from "./components/Message";
 
-function App() {
+import "./App.css";
+
+const App = (props) => {
+  const [posts, setPosts] = useState([]);
+  const [message, setMessage] = useState(null);
+
+  const setFlashMessage = (message) => {
+    setMessage(message);
+    setTimeout(() => {
+      setMessage(null);
+    }, 2000);
+  };
+
+  const addNewPost = (post) => {
+    post.id = posts.length + 1;
+    post.slug = encodeURIComponent(
+      post.title.toLowerCase().split(" ").join("-")
+    );
+    setPosts([...posts, post]);
+    setFlashMessage('saved')
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Header />
+        {message && <Message type={message} />}
+        <Switch>
+          <Route exact path="/" render={() => <Posts posts={posts} />} />
+          <Route
+            path="/post/:postSlug"
+            render={(props) => {
+              const post = posts.find(
+                (post) => post.slug === props.match.params.postSlug
+              );
+              if (post) return <Post post={post} />;
+              else return <NotFound />;
+            }}
+          />
+          <Route
+            exact
+            path="/new"
+            render={() => <PostForm addNewPost={addNewPost} />}
+          />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
