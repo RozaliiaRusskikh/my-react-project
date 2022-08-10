@@ -31,7 +31,7 @@ const App = (props) => {
       post.title.toLowerCase().split(" ").join("-")
     );
     setPosts([...posts, post]);
-    setFlashMessage('saved')
+    setFlashMessage("saved");
   };
 
   return (
@@ -55,6 +55,19 @@ const App = (props) => {
             exact
             path="/new"
             render={() => <PostForm addNewPost={addNewPost} />}
+          />
+          <Route
+            path="/edit/:post-slug"
+            render={(props) => {
+              const post = posts.find(
+                (post) => post.slug === props.match.params.postSlug
+              );
+              if (post) {
+                return <PostForm post={post} />;
+              } else {
+                return <Redirect to="/" />;
+              }
+            }}
           />
           <Route component={NotFound} />
         </Switch>
