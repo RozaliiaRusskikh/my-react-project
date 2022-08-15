@@ -58,7 +58,11 @@ const App = (props) => {
         <Header />
         {message && <Message type={message} />}
         <Switch>
-        render={() => <Posts posts={posts} deletePost={deletePost} />}
+          <Route
+            exact
+            path="/"
+            render={() => <Posts posts={posts} deletePost={deletePost} />}
+          />
           <Route
             path="/post/:postSlug"
             render={(props) => {
@@ -66,7 +70,9 @@ const App = (props) => {
                 (post) => post.slug === props.match.params.postSlug
               );
               if (post) return <Post post={post} />;
-              else return <NotFound />;
+              else {
+                return <Redirect to="/" />;
+              }
             }}
           />
           <Route
